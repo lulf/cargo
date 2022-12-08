@@ -16,6 +16,7 @@ pub fn cli() -> Command {
             "allow-dirty",
             "Allow dirty working directories to be packaged",
         ))
+        .arg(flag("sign", "Sign the package"))
         .arg_target_triple("Build for the target triple")
         .arg_target_dir()
         .arg_package("Package to publish")
@@ -45,6 +46,7 @@ pub fn exec(config: &mut Config, args: &ArgMatches) -> CliResult {
             jobs: args.jobs()?,
             keep_going: args.keep_going(),
             dry_run: args.dry_run(),
+            sign: args.flag("sign"),
             registry,
             cli_features: args.cli_features()?,
         },

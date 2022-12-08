@@ -107,6 +107,7 @@ pub struct PublishOpts<'cfg> {
     pub dry_run: bool,
     pub registry: Option<String>,
     pub cli_features: CliFeatures,
+    pub sign: bool,
 }
 
 pub fn publish(ws: &Workspace<'_>, opts: &PublishOpts<'_>) -> CargoResult<()> {
@@ -219,6 +220,11 @@ pub fn publish(ws: &Workspace<'_>, opts: &PublishOpts<'_>) -> CargoResult<()> {
             Some(mutation),
         )?));
     }
+
+    // TODO: Move this out somewhere
+    use sigstore::fulcio::FulcioClient;
+
+    let fulcio = FulcioClient::new(fulcio_url, Default::default());
 
     opts.config
         .shell()
