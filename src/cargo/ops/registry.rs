@@ -222,9 +222,13 @@ pub fn publish(ws: &Workspace<'_>, opts: &PublishOpts<'_>) -> CargoResult<()> {
     }
 
     // TODO: Move this out somewhere
-    use sigstore::fulcio::FulcioClient;
+    use sigstore::fulcio::{FulcioClient, TokenProvider};
 
-    let fulcio = FulcioClient::new(fulcio_url, Default::default());
+    let fulcio_url = "https://fulcio.sigstore.dev";
+    let fulcio = FulcioClient::new(
+        fulcio_url.try_into().unwrap(),
+        TokenProvider::Oauth(Default::default()),
+    );
 
     opts.config
         .shell()
