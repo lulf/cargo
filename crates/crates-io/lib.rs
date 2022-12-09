@@ -57,6 +57,15 @@ pub struct NewCrate {
     pub repository: Option<String>,
     pub badges: BTreeMap<String, BTreeMap<String, String>>,
     pub links: Option<String>,
+    pub signature: Option<NewCrateSignature>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct NewCrateSignature {
+    pub signature: String,
+    pub email: String,
+    pub cert: String,
+    pub checksum: [u8; 32],
 }
 
 #[derive(Serialize, Deserialize)]

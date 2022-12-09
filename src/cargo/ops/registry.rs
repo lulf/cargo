@@ -10,7 +10,7 @@ use std::{cmp, env};
 
 use anyhow::{anyhow, bail, format_err, Context as _};
 use cargo_util::paths;
-use crates_io::{self, NewCrate, NewCrateDependency, Registry};
+use crates_io::{self, NewCrate, NewCrateDependency, NewCrateSignature, Registry};
 use curl::easy::{Easy, InfoType, SslOpt, SslVersion};
 use log::{log, Level};
 use pasetors::keys::{AsymmetricKeyPair, Generate};
@@ -230,6 +230,10 @@ pub fn publish(ws: &Workspace<'_>, opts: &PublishOpts<'_>) -> CargoResult<()> {
         TokenProvider::Oauth(Default::default()),
     );
 
+    // TODO Blocking fulcio client using curl
+
+    let signature = None;
+
     opts.config
         .shell()
         .status("Uploading", pkg.package_id().to_string())?;
@@ -240,6 +244,7 @@ pub fn publish(ws: &Workspace<'_>, opts: &PublishOpts<'_>) -> CargoResult<()> {
         &mut registry,
         reg_ids.original,
         opts.dry_run,
+        &signature,
     )?;
     if !opts.dry_run {
         const DEFAULT_TIMEOUT: u64 = 60;
@@ -300,6 +305,7 @@ fn transmit(
     registry: &mut Registry,
     registry_id: SourceId,
     dry_run: bool,
+    signature: &Option<NewCrateSignature>,
 ) -> CargoResult<()> {
     let deps = pkg
         .dependencies()
@@ -408,6 +414,7 @@ fn transmit(
                 license_file: license_file.clone(),
                 badges: badges.clone(),
                 links: links.clone(),
+                signature: signature.clone(),
             },
             tarball,
         )
